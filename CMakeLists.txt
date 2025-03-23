@@ -68,17 +68,19 @@ set(msvc-rt-mt-dll $<STREQUAL:${msvc-rt},MultiThreadedDLL>)
 
 set(backport-msvc-runtime $<VERSION_LESS:${CMAKE_VERSION},3.15>)
 
-add_library(yaml-cpp ${yaml-cpp-type} "")
-add_library(yaml-cpp::yaml-cpp ALIAS yaml-cpp)
+set(yaml-cpp-target "yaml-cpp-0.7.0")
 
-set_property(TARGET yaml-cpp
+add_library(${yaml-cpp-target} ${yaml-cpp-type} "")
+add_library(${yaml-cpp-target}::yaml-cpp ALIAS ${yaml-cpp-target})
+
+set_property(TARGET ${yaml-cpp-target}
   PROPERTY
     MSVC_RUNTIME_LIBRARY ${CMAKE_MSVC_RUNTIME_LIBRARY})
-set_property(TARGET yaml-cpp
+set_property(TARGET ${yaml-cpp-target}
   PROPERTY
     CXX_STANDARD_REQUIRED ON)
 
-target_include_directories(yaml-cpp
+target_include_directories(${yaml-cpp-target}
   PUBLIC
     $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
     $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
@@ -86,12 +88,12 @@ target_include_directories(yaml-cpp
     $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src>)
 
 if (NOT DEFINED CMAKE_CXX_STANDARD)
-  set_target_properties(yaml-cpp
+  set_target_properties(${yaml-cpp-target}
     PROPERTIES
       CXX_STANDARD 11)
 endif()
 
-target_compile_options(yaml-cpp
+target_compile_options(${yaml-cpp-target}
   PRIVATE
     $<${not-msvc}:-Wall -Wextra -Wshadow -Weffc++ -Wno-long-long>
     $<${not-msvc}:-pedantic -pedantic-errors>
@@ -107,12 +109,12 @@ target_compile_options(yaml-cpp
     # http://msdn.microsoft.com/en-us/library/3c594ae3.aspx
     $<$<CXX_COMPILER_ID:MSVC>:/W3 /wd4127 /wd4355>)
 
-target_compile_definitions(yaml-cpp
+target_compile_definitions(${yaml-cpp-target}
   PRIVATE
     $<${build-windows-dll}:${PROJECT_NAME}_DLL>
     $<$<NOT:$<BOOL:${YAML_CPP_BUILD_CONTRIB}>>:YAML_CPP_NO_CONTRIB>)
 
-target_sources(yaml-cpp
+target_sources(${yaml-cpp-target}
   PRIVATE
     $<$<BOOL:${YAML_CPP_BUILD_CONTRIB}>:${yaml-cpp-contrib-sources}>
     ${yaml-cpp-sources})
@@ -121,7 +123,7 @@ if (NOT DEFINED CMAKE_DEBUG_POSTFIX)
   set(CMAKE_DEBUG_POSTFIX "d")
 endif()
 
-set_target_properties(yaml-cpp PROPERTIES
+set_target_properties(${yaml-cpp-target} PROPERTIES
   VERSION "${PROJECT_VERSION}"
   SOVERSION "${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}"
   PROJECT_LABEL "yaml-cpp ${yaml-cpp-label-postfix}"
@@ -139,15 +141,15 @@ write_basic_package_version_file(
 configure_file(yaml-cpp.pc.in yaml-cpp.pc @ONLY)
 
 if (YAML_CPP_INSTALL)
-	install(TARGETS yaml-cpp
-    EXPORT yaml-cpp-targets
+	install(TARGETS ${yaml-cpp-target}
+    EXPORT ${yaml-cpp-target}-targets
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
     ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
 	install(DIRECTORY ${PROJECT_SOURCE_DIR}/include/
     DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
 		FILES_MATCHING PATTERN "*.h")
-  install(EXPORT yaml-cpp-targets
+  install(EXPORT ${yaml-cpp-target}-targets
     DESTINATION "${CMAKE_INSTALL_DATADIR}/cmake/yaml-cpp")
 	install(FILES
 		"${PROJECT_BINARY_DIR}/yaml-cpp-config.cmake"

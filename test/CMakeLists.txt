@@ -20,21 +20,21 @@ endif()
 file(GLOB test-new-api-sources ${test-new-api-pattern})
 file(GLOB test-sources ${test-source-pattern})
 
-add_executable(yaml-cpp-tests "")
-target_sources(yaml-cpp-tests
+add_executable(${yaml-cpp-target}-tests "")
+target_sources(${yaml-cpp-target}-tests
   PRIVATE
     ${test-new-api-sources}
     ${test-sources})
-target_include_directories(yaml-cpp-tests
+target_include_directories(${yaml-cpp-target}-tests
   PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/integration
     ${CMAKE_CURRENT_SOURCE_DIR}
     ${PROJECT_SOURCE_DIR}/src)
-target_compile_options(yaml-cpp-tests
+target_compile_options(${yaml-cpp-target}-tests
   PRIVATE
     $<$<CXX_COMPILER_ID:Clang>:-Wno-c99-extensions -Wno-variadic-macros -Wno-sign-compare>
     $<$<CXX_COMPILER_ID:GNU>:-Wno-variadic-macros -Wno-sign-compare>)
-target_link_libraries(yaml-cpp-tests
+target_link_libraries(${yaml-cpp-target}-tests
   PRIVATE
     Threads::Threads
     ${yaml-cpp-target}
@@ -42,8 +42,7 @@ target_link_libraries(yaml-cpp-tests
 
 set_property(TARGET yaml-cpp-tests PROPERTY CXX_STANDARD_REQUIRED ON)
 if (NOT DEFINED CMAKE_CXX_STANDARD)
-  set_target_properties(yaml-cpp-tests PROPERTIES CXX_STANDARD 11)
+  set_target_properties(${yaml-cpp-target}-tests PROPERTIES CXX_STANDARD 11)
 endif()
 
-
-add_test(${yaml-cpp-target}::test yaml-cpp-tests)
+add_test(${yaml-cpp-target}::test ${yaml-cpp-target}-tests)

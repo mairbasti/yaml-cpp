@@ -68,7 +68,7 @@ set(msvc-rt-mt-dll $<STREQUAL:${msvc-rt},MultiThreadedDLL>)
 
 set(backport-msvc-runtime $<VERSION_LESS:${CMAKE_VERSION},3.15>)
 
-set(yaml-cpp-target "yaml-cpp-0.7.0")
+set(yaml-cpp-target "yaml-cpp-070")
 
 add_library(${yaml-cpp-target} ${yaml-cpp-type} "")
 add_library(${yaml-cpp-target}::yaml-cpp ALIAS ${yaml-cpp-target})
